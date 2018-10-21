@@ -1,0 +1,22 @@
+{
+  "name": "slackkarma",
+  "version": "0.0.1",
+  "description": "Give karma to users in your slack team",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "slack",
+    "karma",
+    "bot"
+  ],
+  "author": "statox (me@statox.fr)",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  }
+}
