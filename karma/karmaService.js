@@ -5,10 +5,62 @@ const responseService = require('./responseService.js');
 var karma = {}
 
 /*
+ * Increment or decrement the karma of a user when a reaction
+ * is added to one message
+ */
+karma.giveFromReaction = function(req, res) {
+    var payload = req.body;
+
+    // Code to return the challenge part of the body to verify the
+    // slack integration
+    if (payload.challenge) {
+        return payload.challenge;
+    }
+
+    var poster     = payload.event.item_user;
+    var requester  = payload.event.user;
+    var action     = payload.event.type;
+    var reaction   = payload.event.reaction;
+
+
+    // We only monitor the thumbsup reaction
+    if (reaction !== '+1') {
+        console.log("Wront event, don't trigger the karma count", payload.event.reaction);
+        return
+    }
+
+    // Ignore the reaction on user's self post
+    if (poster === requester) {
+        console.log("Don't count karma on self post", poster, requester);
+        return;
+    }
+
+    // Getting the score of the user or initializing it
+    var score = 0;
+    if (karma.store.users[poster]) {
+        score = karma.store.users[poster];
+    }
+
+    // Modification of the poster score
+    if (action === "reaction_added") {
+        console.log("incrementing the score", action, poster);
+        score++;
+    } else {
+        console.log("decrementing the score", action, poster);
+        score --;
+    }
+
+    karma.store.users[poster] = score;
+
+    // Keep the state
+    dataService.setStore(karma.store);
+}
+
+/*
  * Given a request sent by slack action
  * Increment the karma of the user
  */
-karma.give = function(req, res) {
+karma.giveFromAction = function(req, res) {
     var payload = JSON.parse(req.body.payload);
 
     if (payload.callback_id !== 'give-karma') {
